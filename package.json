@@ -1,0 +1,51 @@
+{
+  "name": "smallchat",
+  "version": "1.0.0",
+  "description": "A simple desktop chat app for GitHub Copilot with MCP server support",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.smallchat.app",
+    "productName": "SmallChat",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "renderer/**/*",
+      "assets/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico",
+      "artifactName": "${productName}-${version}-${arch}-Setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "deleteAppDataOnUninstall": false
+    },
+    "mac": {
+      "target": "dmg"
+    }
+  },
+  "dependencies": {
+    "@azure/identity": "^4.13.1",
+    "@modelcontextprotocol/sdk": "^1.28.0",
+    "electron-store": "^8.1.0",
+    "marked": "^17.0.5",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0",
+    "png-to-ico": "^3.0.1",
+    "rcedit": "^5.0.2",
+    "sharp": "^0.34.5"
+  }
+}

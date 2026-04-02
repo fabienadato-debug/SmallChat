@@ -1,0 +1,40 @@
+{
+  "mcpServers": {
+    "my-mcp-server-a3de7213": {
+      "url": "https://api.fabric.microsoft.com/v1/mcp/workspaces/49350785-2d0c-45f9-a7a5-8275f707d153/dataagents/72db418b-f736-47da-8603-b5903fb833ba/agent",
+      "type": "http"
+    },
+    "powerbi-model": {
+      "type": "stdio",
+      "command": "C:\\MCPServers\\PowerBIModelingMCP\\extension\\server\\powerbi-modeling-mcp.exe",
+      "args": [
+        "--start"
+      ],
+      "env": {}
+    },
+    "fabric-mcp": {
+      "type": "stdio",
+      "command": "C:\\MCPServers\\fabric.vscode-fabric-mcp-server-0.0.10-win32-arm64\\extension\\server\\fabmcp.exe",
+      "args": ["server", "start", "--mode", "all"],
+      "env": {}
+    },
+    "semantic_model_mcp_server": {
+      "command": "C:\\MCPServers\\fabric-toolbox\\tools\\SemanticModelMCPServer\\.venv\\Scripts\\python",
+      "args": [
+        "C:\\MCPServers\\fabric-toolbox\\tools\\SemanticModelMCPServer\\server.py"
+      ]
+    },
+    "dax-performance-tuner": {
+      "command": "C:\\MCPServers\\fabric-toolbox\\tools\\DAXPerformanceTunerMCPServer\\src\\DaxPerformanceTuner.Console\\bin\\Release\\net8.0-windows\\win-x64\\publish\\dax-performance-tuner.exe",
+      "args": [
+        "--start"
+      ]
+    },
+    "fabric-mgmt": {
+      "command": "C:\\MCPServers\\fabric-toolbox\\tools\\MicrosoftFabricMgmtMCPServer\\.venv\\Scripts\\python.exe",
+      "args": [
+        "C:\\MCPServers\\fabric-toolbox\\tools\\MicrosoftFabricMgmtMCPServer\\server.py"
+      ]
+    }
+  }
+}

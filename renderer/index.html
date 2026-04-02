@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https://avatars.githubusercontent.com; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmallChat</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Login overlay -->
+  <div id="login-overlay" class="overlay">
+    <div class="overlay-card">
+      <img src="../assets/icon.png" alt="SmallChat" class="login-logo" />
+      <h1>SmallChat</h1>
+      <p>Chat with GitHub Copilot models + MCP servers</p>
+
+      <!-- Step 1: Sign in button -->
+      <div id="login-step-start">
+        <button id="btn-github-login" class="btn-primary" style="width:100%;margin-bottom:12px;">Sign in with GitHub</button>
+        <details style="margin-top:8px;">
+          <summary style="cursor:pointer;color:var(--text-muted);font-size:0.85em;">Use a Personal Access Token instead</summary>
+          <div class="form-group" style="margin-top:8px;">
+            <input type="password" id="token-input" placeholder="ghp_... or github_pat_..." autocomplete="off" />
+            <small>For GitHub Models free tier only (no Copilot access).</small>
+          </div>
+          <button id="btn-login" class="btn-secondary" style="width:100%;">Sign In with Token</button>
+        </details>
+      </div>
+
+      <!-- Step 2: Device code shown -->
+      <div id="login-step-code" hidden>
+        <p style="margin-bottom:8px;">Enter this code on GitHub:</p>
+        <div id="device-code" style="font-size:2em;font-weight:bold;letter-spacing:4px;text-align:center;padding:16px;background:var(--bg-input);border-radius:8px;margin-bottom:12px;"></div>
+        <p style="font-size:0.9em;color:var(--text-muted);margin-bottom:12px;">A browser window will open. Paste the code above and authorize SmallChat.</p>
+        <button id="btn-cancel-device" class="btn-secondary" style="width:100%;">Cancel</button>
+      </div>
+
+      <div id="login-error" class="error-msg" hidden></div>
+
+      <div style="margin-top:16px;text-align:center;">
+        <a href="#" id="btn-custom-llm" style="color:var(--text-muted);font-size:0.85em;">Use with a custom LLM instead</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings overlay -->
+  <div id="settings-overlay" class="overlay" hidden>
+    <div class="overlay-card">
+      <h2>Settings</h2>
+      <div class="form-group">
+        <label for="settings-mode">API Mode</label>
+        <select id="settings-mode">
+          <option value="copilot">GitHub Copilot (recommended)</option>
+          <option value="models">GitHub Models (free tier)</option>
+          <option value="custom">Custom (OpenAI-compatible)</option>
+        </select>
+      </div>
+      <div id="custom-api-key-group" class="form-group" hidden>
+        <label>Authentication</label>
+        <div class="radio-row">
+          <label><input type="radio" name="custom-auth-type" value="apikey" checked /> API Key</label>
+          <label><input type="radio" name="custom-auth-type" value="entra" /> Entra ID (Azure)</label>
+        </div>
+        <div id="custom-apikey-fields">
+          <input type="password" id="settings-custom-key" placeholder="sk-... or leave empty for Ollama" autocomplete="off" style="margin-top:6px;" />
+        </div>
+        <div id="custom-entra-fields" hidden>
+          <input type="text" id="settings-entra-tenant" placeholder="Tenant ID (optional — leave empty for common)" autocomplete="off" style="margin-top:6px;" />
+          <small style="color:var(--text-muted);">Uses device code flow to sign in with Microsoft Entra ID for Azure OpenAI.</small>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="settings-model">Model</label>
+        <input type="text" id="settings-model-text" placeholder="e.g. llama3, mistral, gpt-4o" hidden />
+        <select id="settings-model">
+          <!-- Copilot models populated dynamically -->
+          <!-- GitHub Models models (static) -->
+          <optgroup label="OpenAI" data-mode="models">
+            <option value="openai/gpt-4.1">GPT-4.1</option>
+            <option value="openai/gpt-4.1-mini">GPT-4.1 Mini</option>
+            <option value="openai/gpt-4.1-nano">GPT-4.1 Nano</option>
+            <option value="openai/gpt-4o">GPT-4o</option>
+            <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+            <option value="openai/o4-mini">o4-mini</option>
+            <option value="openai/o3-mini">o3-mini</option>
+          </optgroup>
+          <optgroup label="xAI" data-mode="models">
+            <option value="xai/grok-3">Grok 3</option>
+            <option value="xai/grok-3-mini">Grok 3 Mini</option>
+          </optgroup>
+          <optgroup label="DeepSeek" data-mode="models">
+            <option value="deepseek/DeepSeek-R1">DeepSeek R1</option>
+          </optgroup>
+          <optgroup label="Meta" data-mode="models">
+            <option value="meta/llama-4-scout">Llama 4 Scout</option>
+            <option value="meta/llama-4-maverick">Llama 4 Maverick</option>
+          </optgroup>
+          <optgroup label="Microsoft" data-mode="models">
+            <option value="microsoft/phi-4">Phi-4</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="settings-endpoint">API Endpoint</label>
+        <input type="text" id="settings-endpoint" placeholder="https://models.github.ai/inference/chat/completions" />
+      </div>
+      <div class="form-group">
+        <label for="settings-mcp">MCP Servers (JSON)</label>
+        <div class="json-editor-wrap">
+          <pre id="json-highlight" class="json-highlight" aria-hidden="true"></pre>
+          <textarea id="settings-mcp" rows="10" spellcheck="false" class="json-textarea" placeholder='{"mcpServers":{}}'></textarea>
+        </div>
+        <small id="mcp-json-error" class="error-text" hidden>Invalid JSON</small>
+      </div>
+      <div class="btn-row">
+        <button id="btn-settings-save" class="btn-primary">Save</button>
+        <button id="btn-settings-cancel" class="btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main app -->
+  <div id="app" hidden>
+    <!-- Header -->
+    <header id="header">
+      <div class="header-left">
+        <button id="btn-history" class="btn-icon" title="Chat history">☰</button>
+        <img src="../assets/icon.png" alt="SmallChat" class="app-logo" />
+        <span class="app-title">SmallChat</span>
+        <span id="mcp-badge" class="badge" title="MCP servers">MCP: 0</span>
+      </div>
+      <div class="header-right">
+        <button id="btn-new-chat" class="btn-secondary btn-sm" title="New chat">+ New</button>
+        <span id="user-info"></span>
+        <button id="btn-settings" class="btn-icon" title="Settings">⚙</button>
+        <button id="btn-logout" class="btn-icon" title="Sign out">⏻</button>
+      </div>
+    </header>
+
+    <!-- History sidebar -->
+    <aside id="history-sidebar" hidden>
+      <div class="sidebar-header">
+        <span>Chat History</span>
+        <button id="btn-close-history" class="btn-icon">✕</button>
+      </div>
+      <div id="history-list"></div>
+    </aside>
+
+    <!-- Messages -->
+    <main id="messages"></main>
+
+    <!-- Attachments bar -->
+    <div id="attachments-bar" hidden>
+      <div id="attachments-list"></div>
+    </div>
+
+    <!-- Input area -->
+    <footer id="input-area">
+      <button id="btn-attach" class="btn-icon" title="Attach files">+</button>
+      <textarea id="chat-input" placeholder="Type your message..." rows="1"></textarea>
+      <button id="btn-send" class="btn-primary" title="Send">Send</button>
+    </footer>
+
+    <!-- Azure device-code login overlay -->
+    <div id="azure-login-overlay" class="overlay" hidden>
+      <div class="overlay-card">
+        <h2>Azure Sign-In Required</h2>
+        <p id="azure-login-msg">An MCP server needs Azure authentication.</p>
+        <div class="device-code-box">
+          <span id="azure-device-code"></span>
+        </div>
+        <p>Open <a id="azure-verify-link" href="#">microsoft.com/devicelogin</a> and enter the code above.</p>
+        <p style="color:var(--text-muted); font-size:12px;">This window will close automatically once you sign in.</p>
+      </div>
+    </div>
+
+    <!-- MCP panel (collapsible) -->
+    <div id="mcp-panel" hidden>
+      <div class="panel-header">
+        <span>MCP Servers</span>
+        <button id="btn-close-mcp" class="btn-icon">✕</button>
+      </div>
+      <div id="mcp-panel-body"></div>
+      <button id="btn-mcp-reconnect" class="btn-secondary">Reconnect All</button>
+    </div>
+  </div>
+
+  <script src="marked.umd.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
