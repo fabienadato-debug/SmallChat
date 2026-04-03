@@ -107,7 +107,7 @@ For **Entra ID**, SmallChat acquires a token with scope `https://cognitiveservic
 ## Quick Start
 ### Option 1: Run the portable EXE
 
-Download the latest `SmallChat-x.x.x-arm64.exe` or `SmallChat-x.x.x-x64.exe` from the `dist/` folder and run it directly — no installation or Node.js required.
+Download the latest `SmallChat-x.x.x-arm64.exe` or `SmallChat-x.x.x-x64.exe` from the `exe/` folder and run it directly — no installation or Node.js required.
 
 ### Option 2: Run from source
 ```bash
