@@ -62,10 +62,28 @@ graph LR
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) 18+
-- A **GitHub Copilot license** (recommended) — unlocks the Copilot API with higher rate limits and the full model catalog
-- A **GitHub Personal Access Token** (optional) — only needed for the GitHub Models free tier fallback
-- **None** — for custom LLM mode with local models (Ollama, LM Studio) or Entra ID auth
+- **Using the portable EXE** — no prerequisites, just download and run
+- **Running from source** — requires [Node.js](https://nodejs.org/) 18+
+- **Authentication** (depends on your LLM mode):
+  - **GitHub Copilot** — a GitHub Copilot license (recommended, highest rate limits)
+  - **GitHub Models** — a GitHub Personal Access Token with `read:user` and `models:read` scopes
+  - **Custom LLM** — nothing, works out of the box with Ollama, LM Studio, Azure OpenAI, etc.
+
+## Quick Start
+### Option 1: Run the portable EXE
+
+Download the latest `SmallChat-x.x.x-arm64-Setup.exe` or `SmallChat-x.x.x-x64-Setup.exe` from the `setup/` folder and run it directly — no installation or Node.js required.
+
+### Option 2: Run from source
+```bash
+# Install dependencies
+npm install
+
+# Run the app
+npm start
+```
+
+On first launch, click **"Sign in with GitHub"** and follow the device flow to authorize with your Copilot license.
 
 ## Authentication
 
@@ -104,21 +122,6 @@ For GitHub Models free tier only:
 
 For **Entra ID**, SmallChat acquires a token with scope `https://cognitiveservices.azure.com/.default` via device code flow. The token is cached and refreshed automatically.
 
-## Quick Start
-### Option 1: Run the portable EXE
-
-Download the latest `SmallChat-x.x.x-arm64-Setup.exe` or `SmallChat-x.x.x-x64-Setup.exe` from the `setup/` folder and run it directly — no installation or Node.js required.
-
-### Option 2: Run from source
-```bash
-# Install dependencies
-npm install
-
-# Run the app
-npm start
-```
-
-On first launch, click **“Sign in with GitHub”** and follow the device flow to authorize with your Copilot license.
 
 ## MCP Server Configuration
 
